@@ -22,7 +22,7 @@ const CompanyCreate = () => {
         }
 
         try {
-            const res = await axios.post(`${COMPANY_API_END_POINT}/register`, { name: companyName }, {
+            const res = await axios.post(`https://jobportal-mern-xk69.onrender.com/register`, { name: companyName }, {
                 headers: {
                     'Content-Type':'application/json'
                 },
