@@ -30,7 +30,7 @@ const Login = () => {
         e.preventDefault();
         try {
             dispatch(setLoading(true));
-            const res = await axios.post("https://jobportal-mern-xk69.onrender.com/login", input, {
+            const res = await axios.post(`https://jobportal-mern-xk69.onrender.com/login`, input, {
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -77,7 +77,7 @@ const Login = () => {
                             value={input.password}
                             name="password"
                             onChange={changeEventHandler}
-                            placeholder="1234"
+                            placeholder="abc"
                         />
                     </div>
                     <div className='flex items-center justify-between'>
