@@ -4,23 +4,22 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 
-
-
+// ---------------- REGISTER ----------------
 export const register = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, password, role } = req.body;
 
         if (!fullname || !email || !phoneNumber || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "Please fill all required fields.",
                 success: false
             });
         }
 
+        // Upload profile file if exists
         let cloudResponse;
-        const file = req.file;
-        if (file) {
-            const fileUri = getDataUri(file);
+        if (req.file) {
+            const fileUri = getDataUri(req.file);
             cloudResponse = await cloudinary.uploader.upload(fileUri.content);
         }
 
@@ -41,7 +40,7 @@ export const register = async (req, res) => {
             password: hashedPassword,
             role,
             profile: {
-                profilePhoto: cloudResponse ? cloudResponse.secure_url : null
+                profilePhoto: cloudResponse?.secure_url || null
             }
         });
 
@@ -51,82 +50,93 @@ export const register = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
+        console.error("Register Error:", error.message);
         return res.status(500).json({
-            message: "Server error",
+            message: error.message || "Server error during registration.",
             success: false
         });
     }
 };
 
-
-
-              
+// ---------------- LOGIN ----------------
 export const login = async (req, res) => {
     try {
         const { email, password, role } = req.body;
-        
+
         if (!email || !password || !role) {
             return res.status(400).json({
-                message: "Something is missing",
+                message: "Please fill all required fields.",
                 success: false
             });
-        };
-        let user = await User.findOne({ email });
+        }
+
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({
                 message: "Incorrect email or password.",
                 success: false,
-            })
+            });
         }
+
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
             return res.status(400).json({
                 message: "Incorrect email or password.",
                 success: false,
-            })
-        };
-        // check role is correct or not
+            });
+        }
+
         if (role !== user.role) {
             return res.status(400).json({
-                message: "Account doesn't exist with current role.",
+                message: "Account doesn't exist with the selected role.",
                 success: false
-            })
-        };
-
-        const tokenData = {
-            userId: user._id
+            });
         }
-        const token = await jwt.sign(tokenData, process.env.SECRET_KEY, { expiresIn: '1d' });
 
-        user = {
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
+
+        const safeUser = {
             _id: user._id,
             fullname: user.fullname,
             email: user.email,
             phoneNumber: user.phoneNumber,
             role: user.role,
             profile: user.profile
-        }
+        };
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
-            message: `Welcome back ${user.fullname}`,
-            user,
+        return res.status(200).cookie("token", token, {
+            maxAge: 24 * 60 * 60 * 1000, // 1 day
+            httpOnly: true,
+            sameSite: 'strict'
+        }).json({
+            message: `Welcome back ${user.fullname}!`,
+            user: safeUser,
             success: true
-        })
+        });
+
     } catch (error) {
-        console.log(error);
+        console.error("Login Error:", error.message);
+        return res.status(500).json({
+            message: error.message || "Server error during login.",
+            success: false
+        });
     }
-}
+};
+
+// ---------------- LOGOUT ----------------
 export const logout = async (req, res) => {
     try {
         return res.status(200).cookie("token", "", { maxAge: 0 }).json({
             message: "Logged out successfully.",
             success: true
-        })
+        });
     } catch (error) {
-        console.log(error);
+        console.error("Logout Error:", error.message);
+        return res.status(500).json({ message: error.message || "Server error", success: false });
     }
-}
+};
+
+// ---------------- UPDATE PROFILE ----------------
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills, password } = req.body;
@@ -136,7 +146,7 @@ export const updateProfile = async (req, res) => {
             return res.status(401).json({ message: "Unauthorized", success: false });
         }
 
-        let user = await User.findById(userId);
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(400).json({ message: "User not found", success: false });
         }
@@ -178,7 +188,7 @@ export const updateProfile = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Server error", success: false });
+        console.error("Update Profile Error:", error.message);
+        return res.status(500).json({ message: error.message || "Server error", success: false });
     }
 };
