@@ -65,7 +65,7 @@ const PostJob = () => {
       }
 
       const res = await axios.post(
-        `https://jobportal-mern-xk69.onrender.com/post`,
+        `https://jobportal-mern-xk69.onrender.com/http:/api/v1/job/post`,
         payload,
         {
           headers: { 'Content-Type': 'application/json' },

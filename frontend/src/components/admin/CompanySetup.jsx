@@ -46,7 +46,7 @@ const CompanySetup = () => {
         }
         try {
             setLoading(true);
-            const res = await axios.put(`https://jobportal-mern-xk69.onrender.com/update/${params.id}`, formData, {
+            const res = await axios.put(`https://jobportal-mern-xk69.onrender.com/api/v1/company/update/${params.id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },

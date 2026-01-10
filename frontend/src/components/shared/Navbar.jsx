@@ -17,7 +17,7 @@ const Navbar = () => {
 
     const logoutHandler = async () => {
         try {
-            const res = await axios.get(`https://jobportal-mern-xk69.onrender.com/logout`, { withCredentials: true });
+            const res = await axios.get(`https://jobportal-mern-xk69.onrender.com/api/v1/user/logout`, { withCredentials: true });
             if (res.data.success) {
                 dispatch(setUser(null));
                 navigate("/");

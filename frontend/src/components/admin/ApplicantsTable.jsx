@@ -16,7 +16,7 @@ const ApplicantsTable = () => {
         console.log('called');
         try {
             axios.defaults.withCredentials = true;
-            const res = await axios.post(`https://jobportal-mern-xk69.onrender.com/status/${id}/update`, { status });
+            const res = await axios.post(`https://jobportal-mern-xk69.onrender.com/api/v1/application/status/update${id}/update`, { status });
             console.log(res);
             if (res.data.success) {
                 toast.success(res.data.message);

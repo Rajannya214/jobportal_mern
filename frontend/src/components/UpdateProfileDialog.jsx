@@ -46,7 +46,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         }
         try {
             setLoading(true); 
-            const res = await axios.post(`https://jobportal-mern-xk69.onrender.com/profile/update`, formData, {
+            const res = await axios.post(`https://jobportal-mern-xk69.onrender.com/api/v1/user/profile/update`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }, 
