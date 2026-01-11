@@ -10,7 +10,7 @@ const useGetAllJobs = () => {
     useEffect(()=>{
         const fetchAllJobs = async () => {
             try {
-                const res = await axios.get(`https://jobportal-mern-xk69.onrender.com/api/v1/job/get/get?keyword=${searchedQuery}`,{withCredentials:true});
+                const res = await axios.get(`https://jobportal-mern-xk69.onrender.com/api/v1/job/get?keyword=${searchedQuery}`,{withCredentials:true});
                 if(res.data.success){
                     dispatch(setAllJobs(res.data.jobs));
                 }
