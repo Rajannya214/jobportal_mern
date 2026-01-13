@@ -69,7 +69,7 @@ const CompanySetup = () => {
         toast.error(res.data?.message || "Failed to update company");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Server Error");
+      toast.error(error.response?.data?.message );
       console.error("Update Company Error:", error);
     } finally {
       setLoading(false); // 🔥 always stop loader
