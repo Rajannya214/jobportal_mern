@@ -8,6 +8,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { USER_API_END_POINT } from '@/utils/constant'
 import { setUser } from '@/redux/authSlice'
+import { 
+    setSingleJob, 
+    setAllJobs, 
+    setAllAppliedJobs, 
+    setSearchedQuery 
+} from '@/redux/jobSlice'
 import { toast } from 'sonner'
 
 const Navbar = () => {
@@ -17,24 +23,42 @@ const Navbar = () => {
 
     const logoutHandler = async () => {
         try {
-            const res = await axios.get(`https://jobportal-mern-xk69.onrender.com/api/v1/user/logout`, { withCredentials: true });
+            const res = await axios.get(
+                `${USER_API_END_POINT}/logout`,
+                { withCredentials: true }
+            );
+
             if (res.data.success) {
+                // Clear auth state
                 dispatch(setUser(null));
+
+                // 🔥 Clear job-related state (IMPORTANT FIX)
+                dispatch(setSingleJob(null));
+                dispatch(setAllJobs([]));
+                dispatch(setAllAppliedJobs([]));
+                dispatch(setSearchedQuery(""));
+
                 navigate("/");
                 toast.success(res.data.message);
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Logout failed");
         }
     }
+
     return (
         <div className='bg-white'>
             <div className='flex items-center justify-between mx-auto max-w-7xl h-16'>
+                
                 <div>
-                    <h1 className='text-2xl font-bold'>Job<span className='text-[#F83002]'>Portal</span></h1>
+                    <h1 className='text-2xl font-bold'>
+                        Job<span className='text-[#F83002]'>Portal</span>
+                    </h1>
                 </div>
+
                 <div className='flex items-center gap-12'>
+                    
                     <ul className='flex font-medium items-center gap-5'>
                         {
                             user && user.role === 'recruiter' ? (
@@ -50,46 +74,72 @@ const Navbar = () => {
                                 </>
                             )
                         }
-
-
                     </ul>
+
                     {
                         !user ? (
                             <div className='flex items-center gap-2'>
-                                <Link to="/login"><Button variant="outline">Login</Button></Link>
-                                <Link to="/signup"><Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Signup</Button></Link>
+                                <Link to="/login">
+                                    <Button variant="outline">Login</Button>
+                                </Link>
+                                <Link to="/signup">
+                                    <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">
+                                        Signup
+                                    </Button>
+                                </Link>
                             </div>
                         ) : (
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Avatar className="cursor-pointer">
-                                        <AvatarImage src={user?.profile?.profilePhoto} alt="@shadcn" />
+                                        <AvatarImage 
+                                            src={user?.profile?.profilePhoto} 
+                                            alt="profile" 
+                                        />
                                     </Avatar>
                                 </PopoverTrigger>
+
                                 <PopoverContent className="w-80">
-                                    <div className=''>
+                                    <div>
                                         <div className='flex gap-2 space-y-2'>
-                                            <Avatar className="cursor-pointer">
-                                                <AvatarImage src={user?.profile?.profilePhoto} alt="profile" />
+                                            <Avatar>
+                                                <AvatarImage 
+                                                    src={user?.profile?.profilePhoto} 
+                                                    alt="profile" 
+                                                />
                                             </Avatar>
                                             <div>
-                                                <h4 className='font-medium'>{user?.fullname}</h4>
-                                                <p className='text-sm text-muted-foreground'>{user?.profile?.bio}</p>
+                                                <h4 className='font-medium'>
+                                                    {user?.fullname}
+                                                </h4>
+                                                <p className='text-sm text-muted-foreground'>
+                                                    {user?.profile?.bio}
+                                                </p>
                                             </div>
                                         </div>
+
                                         <div className='flex flex-col my-2 text-gray-600'>
                                             {
-                                                user && user.role === 'student' && (
+                                                user?.role === 'student' && (
                                                     <div className='flex w-fit items-center gap-2 cursor-pointer'>
                                                         <User2 />
-                                                        <Button variant="link"> <Link to="/profile">View Profile</Link></Button>
+                                                        <Button variant="link">
+                                                            <Link to="/profile">
+                                                                View Profile
+                                                            </Link>
+                                                        </Button>
                                                     </div>
                                                 )
                                             }
 
                                             <div className='flex w-fit items-center gap-2 cursor-pointer'>
                                                 <LogOut />
-                                                <Button onClick={logoutHandler} variant="link">Logout</Button>
+                                                <Button 
+                                                    onClick={logoutHandler} 
+                                                    variant="link"
+                                                >
+                                                    Logout
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>
@@ -100,7 +150,6 @@ const Navbar = () => {
 
                 </div>
             </div>
-
         </div>
     )
 }
