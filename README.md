@@ -1,7 +1,8 @@
 # 💼 Job Portal - MERN Stack
 
 A full-stack **Job Portal** built using the **MERN Stack** that connects job seekers with recruiters. The platform provides role-based authentication, allowing recruiters to post and manage job openings while candidates can search and apply for jobs seamlessly.
-
+## 🌐 Live Demo
+🔗 **Live Website:** https://jobportal-mern-xk69.onrender.com
 ## 🚀 Features
 ### 👨‍💼 For Job Seekers
 - User Registration & Login
